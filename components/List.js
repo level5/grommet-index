@@ -53,7 +53,7 @@ var IndexListItem = function (_Component) {
 
   function IndexListItem() {
     (0, _classCallCheck3.default)(this, IndexListItem);
-    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexListItem).apply(this, arguments));
+    return (0, _possibleConstructorReturn3.default)(this, (IndexListItem.__proto__ || (0, _getPrototypeOf2.default)(IndexListItem)).apply(this, arguments));
   }
 
   (0, _createClass3.default)(IndexListItem, [{
@@ -112,7 +112,7 @@ var IndexList = function (_Component2) {
   function IndexList() {
     (0, _classCallCheck3.default)(this, IndexList);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexList).call(this));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (IndexList.__proto__ || (0, _getPrototypeOf2.default)(IndexList)).call(this));
 
     _this2._onClickItem = _this2._onClickItem.bind(_this2);
     return _this2;
@@ -157,11 +157,16 @@ var IndexList = function (_Component2) {
       }
 
       var listItems = void 0;
-      var selectionIndex = void 0;
+      var multiSelected = Array.isArray(selection);
+      var selectionIndex = multiSelected ? [] : null;
       if (data && data.items) {
         listItems = data.items.map(function (item, index) {
-          if (selection && item.uri === selection) {
-            selectionIndex = index;
+          if (selection) {
+            if (!multiSelected && item.uri === selection) {
+              selectionIndex = index;
+            } else if (multiSelected && selection.includes(item.uri)) {
+              selectionIndex.push(index);
+            }
           }
           return _this3._renderListItem(item, index);
         });
@@ -172,10 +177,15 @@ var IndexList = function (_Component2) {
         onMore = this.props.onMore;
       }
 
+      var selectable = false;
+      if (this.props.onSelect) {
+        selectable = multiSelected ? 'multiple' : true;
+      }
+
       return _react2.default.createElement(
         _List2.default,
         { className: classes.join(' '),
-          selectable: this.props.onSelect ? true : false,
+          selectable: selectable,
           selected: selectionIndex,
           onMore: onMore },
         listItems

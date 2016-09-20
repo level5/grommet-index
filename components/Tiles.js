@@ -68,7 +68,7 @@ var IndexTile = function (_Component) {
 
   function IndexTile() {
     (0, _classCallCheck3.default)(this, IndexTile);
-    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexTile).apply(this, arguments));
+    return (0, _possibleConstructorReturn3.default)(this, (IndexTile.__proto__ || (0, _getPrototypeOf2.default)(IndexTile)).apply(this, arguments));
   }
 
   (0, _createClass3.default)(IndexTile, [{
@@ -154,7 +154,7 @@ var IndexTiles = function (_Component2) {
   function IndexTiles() {
     (0, _classCallCheck3.default)(this, IndexTiles);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexTiles).call(this));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (IndexTiles.__proto__ || (0, _getPrototypeOf2.default)(IndexTiles)).call(this));
 
     _this2._onClickTile = _this2._onClickTile.bind(_this2);
     return _this2;
@@ -341,12 +341,17 @@ var IndexTiles = function (_Component2) {
       var actions = _props3.actions;
 
       var tiles = void 0;
-      var selectionIndex = void 0;
+      var multiSelected = Array.isArray(selection);
+      var selectionIndex = multiSelected ? [] : null;
       var header = void 0;
       if (data && data.items.length) {
         tiles = data.items.map(function (item, index) {
-          if (selection && item.uri === selection) {
-            selectionIndex = index;
+          if (selection) {
+            if (!multiSelected && item.uri === selection) {
+              selectionIndex = index;
+            } else if (multiSelected && selection.includes(item.uri)) {
+              selectionIndex.push(index);
+            }
           }
           return this._renderTile(item);
         }, this);
@@ -360,6 +365,11 @@ var IndexTiles = function (_Component2) {
         }
       }
 
+      var selectable = false;
+      if (this.props.onSelect) {
+        selectable = multiSelected ? 'multiple' : true;
+      }
+
       return _react2.default.createElement(
         'div',
         null,
@@ -368,7 +378,7 @@ var IndexTiles = function (_Component2) {
           _Tiles2.default,
           { className: classes.join(' '), onMore: onMore,
             flush: this.props.flush, fill: this.props.fill,
-            selectable: this.props.onSelect ? true : false,
+            selectable: selectable,
             selected: selectionIndex,
             size: this.props.size },
           tiles

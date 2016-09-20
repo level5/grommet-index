@@ -59,7 +59,7 @@ var IndexTableRow = function (_Component) {
 
   function IndexTableRow() {
     (0, _classCallCheck3.default)(this, IndexTableRow);
-    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexTableRow).apply(this, arguments));
+    return (0, _possibleConstructorReturn3.default)(this, (IndexTableRow.__proto__ || (0, _getPrototypeOf2.default)(IndexTableRow)).apply(this, arguments));
   }
 
   (0, _createClass3.default)(IndexTableRow, [{
@@ -103,7 +103,7 @@ var IndexTable = function (_Component2) {
   function IndexTable(props) {
     (0, _classCallCheck3.default)(this, IndexTable);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(IndexTable).call(this, props));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (IndexTable.__proto__ || (0, _getPrototypeOf2.default)(IndexTable)).call(this, props));
 
     _this2._onClickRow = _this2._onClickRow.bind(_this2);
     _this2.state = { attributes: _this2._simplifyAttributes(props.attributes) };
@@ -202,11 +202,16 @@ var IndexTable = function (_Component2) {
       }
 
       var rows = void 0;
-      var selectionIndex = void 0;
+      var multiSelected = Array.isArray(selection);
+      var selectionIndex = multiSelected ? [] : null;
       if (data && data.items) {
         rows = data.items.map(function (item, index) {
-          if (selection && item.uri === selection) {
-            selectionIndex = index;
+          if (selection) {
+            if (!multiSelected && item.uri === selection) {
+              selectionIndex = index;
+            } else if (multiSelected && selection.includes(item.uri)) {
+              selectionIndex.push(index);
+            }
           }
           return _this3._renderRow(item);
         });
@@ -217,10 +222,15 @@ var IndexTable = function (_Component2) {
         onMore = this.props.onMore;
       }
 
+      var selectable = false;
+      if (this.props.onSelect) {
+        selectable = multiSelected ? 'multiple' : true;
+      }
+
       return _react2.default.createElement(
         _Table2.default,
         { className: classes.join(' '),
-          selectable: this.props.onSelect ? true : false,
+          selectable: selectable,
           scrollable: this.props.scrollable,
           selected: selectionIndex,
           onMore: onMore },
